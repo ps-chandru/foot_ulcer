@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Foot Ulcer Detection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial;
+            background: #f2f2f2;
+            text-align: center;
+        }
+        .card {
+            background: white;
+            margin: 30px auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 10px gray;
+        }
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 8px;
+        }
+        button {
+            padding: 10px;
+            width: 95%;
+            background: blue;
+            color: white;
+            border: none;
+        }
+        .result {
+            margin-top: 15px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Foot Ulcer Detection</h2>
+
+    <input id="t1" placeholder="Temp Left"><br>
+    <input id="t2" placeholder="Temp Right"><br>
+    <input id="p1" placeholder="Pressure 1"><br>
+    <input id="p2" placeholder="Pressure 2"><br>
+    <input id="h" placeholder="Humidity"><br>
+
+    <button onclick="predict()">Predict</button>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+function predict() {
+    fetch('/predict', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            Temp_Left: parseFloat(document.getElementById('t1').value),
+            Temp_Right: parseFloat(document.getElementById('t2').value),
+            Pressure1: parseInt(document.getElementById('p1').value),
+            Pressure2: parseInt(document.getElementById('p2').value),
+            Humidity: parseInt(document.getElementById('h').value)
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        let text = "";
+        if (data.risk == 0) text = "🟢 Normal";
+        else if (data.risk == 1) text = "🟡 Medium Risk";
+        else text = "🔴 High Risk";
+
+        document.getElementById('result').innerText = text;
+    });
+}
+</script>
+
+</body>
+</html>
