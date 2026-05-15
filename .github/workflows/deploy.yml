@@ -1,5 +1,5 @@
 name: Deploy to EC2
-# trigger
+
 on:
   push:
     branches:
@@ -20,8 +20,20 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/your-project-folder
+            # go to project root
+            cd /home/ubuntu/foot_ulcer
+
+            # pull latest code
             git pull origin main
+
+            # go inside actual app folder
+            cd foot_ulcer_project
+
+            # install dependencies
             pip3 install -r requirements.txt
+
+            # stop old app if running
             pkill -f app.py || true
+
+            # start app in background
             nohup python3 app.py > output.log 2>&1 &
