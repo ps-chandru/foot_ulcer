@@ -1,0 +1,251 @@
+# Modern Mobile UI Design for Foot Ulcer Detection
+
+Replace your current HTML with this modern UI.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Foot Ulcer Detection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: gray;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #444;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #4facfe;
+            outline: none;
+            box-shadow: 0 0 8px rgba(79,172,254,0.4);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #4facfe, #00c6fb);
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+        }
+
+        .result {
+            margin-top: 25px;
+            text-align: center;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 22px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .normal {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: gray;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+
+    <div class="logo">🦶</div>
+
+    <h1>Foot Ulcer Detection</h1>
+
+    <p class="subtitle">
+        AI Based Diabetic Foot Monitoring System
+    </p>
+
+    <div class="input-group">
+        <label>Temp Left</label>
+        <input type="number" id="t1" placeholder="Enter left foot temperature">
+    </div>
+
+    <div class="input-group">
+        <label>Temp Right</label>
+        <input type="number" id="t2" placeholder="Enter right foot temperature">
+    </div>
+
+    <div class="input-group">
+        <label>Pressure 1</label>
+        <input type="number" id="p1" placeholder="Enter pressure value 1">
+    </div>
+
+    <div class="input-group">
+        <label>Pressure 2</label>
+        <input type="number" id="p2" placeholder="Enter pressure value 2">
+    </div>
+
+    <div class="input-group">
+        <label>Humidity</label>
+        <input type="number" id="h" placeholder="Enter humidity value">
+    </div>
+
+    <button onclick="predict()">
+        Predict Risk
+    </button>
+
+    <div class="result" id="result"></div>
+
+    <div class="footer">
+        Machine Learning Powered Healthcare System
+    </div>
+
+</div>
+
+<script>
+
+function predict() {
+
+    fetch('/predict', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            Temp_Left: parseFloat(document.getElementById('t1').value),
+            Temp_Right: parseFloat(document.getElementById('t2').value),
+            Pressure1: parseInt(document.getElementById('p1').value),
+            Pressure2: parseInt(document.getElementById('p2').value),
+            Humidity: parseInt(document.getElementById('h').value)
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        let resultBox = document.getElementById('result');
+
+        resultBox.style.display = 'block';
+
+        if(data.risk == 0) {
+            resultBox.className = 'result normal';
+            resultBox.innerHTML = '🟢 NORMAL';
+        }
+        else if(data.risk == 1) {
+            resultBox.className = 'result medium';
+            resultBox.innerHTML = '🟡 MEDIUM RISK';
+        }
+        else {
+            resultBox.className = 'result high';
+            resultBox.innerHTML = '🔴 HIGH RISK';
+        }
+    });
+}
+
+</script>
+
+</body>
+</html>
+```
+
+## Features
+
+* Modern mobile design
+* Gradient background
+* Animated card
+* Beautiful buttons
+* Color risk indication
+* Responsive layout
+* Professional healthcare UI
