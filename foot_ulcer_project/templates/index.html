@@ -1,82 +1,705 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Foot Ulcer Detection</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foot Ulcer Detection System</title>
     <style>
+        :root {
+            --bg-1: #0f172a;
+            --bg-2: #172554;
+            --bg-3: #7c3aed;
+            --panel: rgba(10, 16, 36, 0.66);
+            --panel-border: rgba(255, 255, 255, 0.12);
+            --text: #e5eefb;
+            --muted: rgba(229, 238, 251, 0.74);
+            --accent: #8b5cf6;
+            --accent-2: #38bdf8;
+            --good: #22c55e;
+            --warn: #fb7185;
+            --shadow: 0 32px 90px rgba(0, 0, 0, 0.38);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            min-height: 100%;
+        }
+
         body {
-            font-family: Arial;
-            background: #f2f2f2;
-            text-align: center;
+            font-family: Inter, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(139, 92, 246, 0.32), transparent 32%),
+                radial-gradient(circle at right center, rgba(56, 189, 248, 0.24), transparent 30%),
+                linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 45%, var(--bg-3) 100%);
+            overflow-x: hidden;
         }
-        .card {
-            background: white;
-            margin: 30px auto;
-            padding: 20px;
-            width: 90%;
-            max-width: 400px;
-            border-radius: 15px;
-            box-shadow: 0px 0px 10px gray;
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            inset: auto;
+            border-radius: 999px;
+            pointer-events: none;
+            filter: blur(6px);
+            opacity: 0.6;
         }
-        input {
-            width: 90%;
-            padding: 10px;
-            margin: 8px;
+
+        body::before {
+            width: 260px;
+            height: 260px;
+            top: -90px;
+            left: -70px;
+            background: rgba(56, 189, 248, 0.18);
         }
+
+        body::after {
+            width: 360px;
+            height: 360px;
+            right: -140px;
+            bottom: -120px;
+            background: rgba(139, 92, 246, 0.16);
+        }
+
+        .page-shell {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: minmax(280px, 0.95fr) minmax(360px, 1.05fr);
+            gap: 28px;
+            padding: 28px;
+        }
+
+        .hero,
+        .panel {
+            border: 1px solid var(--panel-border);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+
+        .hero {
+            border-radius: 28px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
+            padding: 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: auto -20px 30px auto;
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.14), transparent 68%);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .brand-mark {
+            width: 54px;
+            height: 54px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #f8fafc 0%, #c7d2fe 100%);
+            color: #4338ca;
+            display: grid;
+            place-items: center;
+            font-size: 1.35rem;
+            font-weight: 800;
+            box-shadow: 0 16px 30px rgba(15, 23, 42, 0.22);
+        }
+
+        .brand-text h1 {
+            font-size: clamp(2.2rem, 3vw, 4rem);
+            line-height: 0.95;
+            letter-spacing: -0.05em;
+            margin-bottom: 10px;
+        }
+
+        .brand-text p {
+            max-width: 500px;
+            color: var(--muted);
+            font-size: 1.02rem;
+            line-height: 1.6;
+        }
+
+        .hero-copy {
+            display: grid;
+            gap: 18px;
+            margin-top: 34px;
+            max-width: 560px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            width: fit-content;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.11);
+            color: #f8fafc;
+            font-size: 0.92rem;
+            letter-spacing: 0.01em;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 34px;
+        }
+
+        .stat-card {
+            padding: 18px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.09);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stat-card .label {
+            color: var(--muted);
+            font-size: 0.88rem;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .panel {
+            border-radius: 28px;
+            background: var(--panel);
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,0.06), transparent 42%);
+            pointer-events: none;
+        }
+
+        .panel-head {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 24px;
+        }
+
+        .panel-head h2 {
+            font-size: 1.25rem;
+            letter-spacing: -0.03em;
+            margin-bottom: 8px;
+        }
+
+        .panel-head p {
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .accent-line {
+            height: 1px;
+            margin-top: 18px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.45), rgba(255,255,255,0.08));
+        }
+
+        form {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            gap: 18px;
+        }
+
+        .form-section {
+            padding: 18px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #f8fafc;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .section-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(139, 92, 246, 0.35));
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            flex: 0 0 auto;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: rgba(248, 250, 252, 0.88);
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 15px 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(15, 23, 42, 0.38);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+        }
+
+        input[type="number"]::placeholder {
+            color: rgba(226, 232, 240, 0.52);
+        }
+
+        input[type="number"]:focus {
+            border-color: rgba(56, 189, 248, 0.85);
+            background: rgba(15, 23, 42, 0.56);
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.14);
+            transform: translateY(-1px);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 14px;
+            margin-top: 4px;
+        }
+
         button {
-            padding: 10px;
-            width: 95%;
-            background: blue;
-            color: white;
             border: none;
+            border-radius: 16px;
+            padding: 15px 18px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease, background 180ms ease;
         }
-        .result {
-            margin-top: 15px;
-            font-size: 20px;
-            font-weight: bold;
+
+        .btn-predict {
+            flex: 1.2;
+            color: #fff;
+            background: linear-gradient(135deg, #38bdf8 0%, #8b5cf6 100%);
+            box-shadow: 0 18px 34px rgba(56, 189, 248, 0.22);
+        }
+
+        .btn-predict:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.24);
+        }
+
+        .btn-clear {
+            flex: 0.8;
+            color: #e2e8f0;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-clear:hover {
+            background: rgba(255, 255, 255, 0.14);
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading,
+        .error-message,
+        .result-container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .loading {
+            display: none;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 18px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(248, 250, 252, 0.9);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.22);
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+            flex: 0 0 auto;
+        }
+
+        .error-message {
+            display: none;
+            padding: 15px 18px;
+            border-radius: 18px;
+            color: #fee2e2;
+            background: rgba(239, 68, 68, 0.16);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .result-container {
+            display: none;
+            padding: 20px;
+            border-radius: 22px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .result-container.show {
+            display: block;
+        }
+
+        .result-container.low-risk {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.9), rgba(56, 189, 248, 0.78));
+        }
+
+        .result-container.high-risk {
+            background: linear-gradient(135deg, rgba(251, 113, 133, 0.92), rgba(248, 113, 113, 0.82));
+        }
+
+        .result-label {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.82);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 10px;
+        }
+
+        .result-value {
+            font-size: clamp(1.8rem, 3vw, 2.4rem);
+            line-height: 1.1;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 10px;
+            letter-spacing: -0.04em;
+        }
+
+        .result-message {
+            color: rgba(255, 255, 255, 0.94);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .info-text {
+            margin-top: 8px;
+            color: var(--muted);
+            text-align: center;
+            font-size: 0.88rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes floatIn {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero,
+        .panel {
+            animation: floatIn 0.7s ease both;
+        }
+
+        .panel { animation-delay: 0.08s; }
+
+        @media (max-width: 1100px) {
+            .page-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                min-height: auto;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .page-shell {
+                padding: 16px;
+                gap: 16px;
+            }
+
+            .hero,
+            .panel {
+                border-radius: 22px;
+                padding: 22px;
+            }
+
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .hero-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
+    <main class="page-shell">
+        <section class="hero">
+            <div>
+                <div class="brand">
+                    <div class="brand-mark">FU</div>
+                    <div class="brand-text">
+                        <h1>Foot Ulcer Detection</h1>
+                        <p>Advanced AI-powered risk assessment for temperature, pressure, and humidity signals.</p>
+                    </div>
+                </div>
 
-<div class="card">
-    <h2>Foot Ulcer Detection</h2>
+                <div class="hero-badge">Clinical screening dashboard</div>
 
-    <input id="t1" placeholder="Temp Left"><br>
-    <input id="t2" placeholder="Temp Right"><br>
-    <input id="p1" placeholder="Pressure 1"><br>
-    <input id="p2" placeholder="Pressure 2"><br>
-    <input id="h" placeholder="Humidity"><br>
+                <div class="hero-copy">
+                    <p>
+                        Enter the latest foot measurements to get a clean, instant prediction from the trained model.
+                        The interface is designed for quick review, visual clarity, and fast decision-making.
+                    </p>
+                </div>
+            </div>
 
-    <button onclick="predict()">Predict</button>
+            <div class="hero-grid">
+                <div class="stat-card">
+                    <div class="label">Input types</div>
+                    <div class="value">5 clinical values</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Prediction mode</div>
+                    <div class="value">Instant ML result</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Layout</div>
+                    <div class="value">Full-screen</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Focus</div>
+                    <div class="value">Clear risk output</div>
+                </div>
+            </div>
+        </section>
 
-    <div class="result" id="result"></div>
-</div>
+        <section class="panel">
+            <div class="panel-head">
+                <h2>Risk Assessment Form</h2>
+                <p>Use current readings from both feet to generate a prediction. The form will validate and send the data to the model automatically.</p>
+                <div class="accent-line"></div>
+            </div>
 
-<script>
-function predict() {
-    fetch('/predict', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            Temp_Left: parseFloat(document.getElementById('t1').value),
-            Temp_Right: parseFloat(document.getElementById('t2').value),
-            Pressure1: parseInt(document.getElementById('p1').value),
-            Pressure2: parseInt(document.getElementById('p2').value),
-            Humidity: parseInt(document.getElementById('h').value)
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        let text = "";
-        if (data.risk == 0) text = "🟢 Normal";
-        else if (data.risk == 1) text = "🟡 Medium Risk";
-        else text = "🔴 High Risk";
+            <form id="predictionForm">
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="section-icon">🌡️</span>
+                        Temperature Readings
+                    </div>
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label for="tempLeft">Left Foot (°C)</label>
+                            <input type="number" id="tempLeft" step="0.1" required placeholder="Enter temperature">
+                        </div>
+                        <div class="input-group">
+                            <label for="tempRight">Right Foot (°C)</label>
+                            <input type="number" id="tempRight" step="0.1" required placeholder="Enter temperature">
+                        </div>
+                    </div>
+                </div>
 
-        document.getElementById('result').innerText = text;
-    });
-}
-</script>
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="section-icon">⚖️</span>
+                        Pressure Measurements
+                    </div>
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label for="pressure1">Pressure 1 (mmHg)</label>
+                            <input type="number" id="pressure1" step="0.1" required placeholder="Enter pressure">
+                        </div>
+                        <div class="input-group">
+                            <label for="pressure2">Pressure 2 (mmHg)</label>
+                            <input type="number" id="pressure2" step="0.1" required placeholder="Enter pressure">
+                        </div>
+                    </div>
+                </div>
 
+                <div class="form-section">
+                    <div class="section-title">
+                        <span class="section-icon">💧</span>
+                        Environmental Data
+                    </div>
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label for="humidity">Humidity (%)</label>
+                            <input type="number" id="humidity" step="0.1" required placeholder="Enter humidity level">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn-predict">Predict Risk</button>
+                    <button type="reset" class="btn-clear">Clear</button>
+                </div>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div>Analyzing data...</div>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+
+            <div class="result-container" id="resultContainer">
+                <div class="result-label">Risk Assessment Result</div>
+                <div class="result-value" id="resultValue">-</div>
+                <div class="result-message" id="resultMessage">-</div>
+            </div>
+
+            <p class="info-text">Results are based on the trained machine learning model.</p>
+        </section>
+    </main>
+
+    <script>
+        const form = document.getElementById('predictionForm');
+        const loading = document.getElementById('loading');
+        const errorMessage = document.getElementById('errorMessage');
+        const resultContainer = document.getElementById('resultContainer');
+        const resultValue = document.getElementById('resultValue');
+        const resultMessage = document.getElementById('resultMessage');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            errorMessage.classList.remove('show');
+            resultContainer.classList.remove('show');
+
+            const tempLeft = parseFloat(document.getElementById('tempLeft').value);
+            const tempRight = parseFloat(document.getElementById('tempRight').value);
+            const pressure1 = parseFloat(document.getElementById('pressure1').value);
+            const pressure2 = parseFloat(document.getElementById('pressure2').value);
+            const humidity = parseFloat(document.getElementById('humidity').value);
+
+            if ([tempLeft, tempRight, pressure1, pressure2, humidity].some((value) => Number.isNaN(value))) {
+                errorMessage.textContent = 'Please fill in all fields before predicting.';
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            loading.style.display = 'flex';
+            const predictBtn = form.querySelector('.btn-predict');
+            predictBtn.disabled = true;
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        'Temp_Left': tempLeft,
+                        'Temp_Right': tempRight,
+                        'Pressure1': pressure1,
+                        'Pressure2': pressure2,
+                        'Humidity': humidity
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Server error: ' + response.status);
+                }
+
+                const data = await response.json();
+                const risk = data.risk;
+
+                loading.style.display = 'none';
+                predictBtn.disabled = false;
+                resultContainer.classList.add('show');
+
+                if (risk === 0) {
+                    resultValue.textContent = 'Low Risk';
+                    resultMessage.textContent = 'No significant ulcer risk detected. Continue with preventive care.';
+                    resultContainer.classList.remove('high-risk');
+                    resultContainer.classList.add('low-risk');
+                } else {
+                    resultValue.textContent = 'High Risk';
+                    resultMessage.textContent = 'Elevated ulcer risk detected. Consult a healthcare professional for further evaluation.';
+                    resultContainer.classList.remove('low-risk');
+                    resultContainer.classList.add('high-risk');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                loading.style.display = 'none';
+                predictBtn.disabled = false;
+                errorMessage.textContent = 'Prediction failed. Make sure the backend server is running.';
+                errorMessage.classList.add('show');
+            }
+        });
+
+        form.addEventListener('reset', () => {
+            resultContainer.classList.remove('show');
+            errorMessage.classList.remove('show');
+            loading.style.display = 'none';
+            form.querySelector('.btn-predict').disabled = false;
+        });
+    </script>
 </body>
 </html>
